@@ -47,7 +47,7 @@ This document tracks which protocol features from [protocol.md](protocol.md) are
 | `ScheduleSlot` dataclass | Yes | Yes | Per-hour schedule slot (preheat temp + mode) |
 | `ScheduleConfig` dataclass | Yes | Yes | 24-hour schedule (list of slots) |
 | Schedule mode byte mapping | Yes | Yes | LOW=0x28, MEDIUM=0x32, HIGH=0x3C |
-| Airflow mode mapping | Yes | Yes | LOW/MEDIUM/HIGH — `AIRFLOW_BYTES` values are unverified (see #21) |
+| Airflow mode mapping | Yes | Yes | LOW/MEDIUM/HIGH — `SETTINGS_BYTE_PAIRS` values are unverified (see #21) |
 | Volume-based calculation | Yes | Yes | ACH multipliers |
 | Sensor metadata for HA | Yes | Yes | Auto-discovery support |
 
@@ -66,4 +66,4 @@ Features that need more data before implementing:
 
 - **Diagnostic bitfield (byte 54)** — Only value 0x0F (all healthy) observed. Bit-to-component mapping is assumed based on UI order. Need a device with a faulty component to verify.
 
-- **~~SETTINGS byte-pair semantics~~** — SETTINGS bytes 7-10 carry clock sync (day, hour, minute, second). The `AIRFLOW_BYTES` pairs (0x19/0x0A, 0x28/0x15, 0x07/0x30) are plausible timestamp values; their role as airflow configuration is unverified. See protocol.md §7.1 and #21.
+- **~~SETTINGS byte-pair semantics~~** — SETTINGS bytes 7-10 carry clock sync (day, hour, minute, second). The `SETTINGS_BYTE_PAIRS` values (0x19/0x0A, 0x28/0x15, 0x07/0x30) observed in clock sync traffic are plausible timestamp values; config-mode semantics unverified. See protocol.md §7.1 and #21.

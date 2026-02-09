@@ -128,7 +128,7 @@ class TestPacketBuilding:
             preheat_temp=16,
             airflow=AIRFLOW_MEDIUM,
         )
-        # Verify structure: magic + type + header + flags + temp + AIRFLOW_BYTES pair + checksum
+        # Verify structure: magic + type + header + flags + temp + SETTINGS_BYTE_PAIRS pair + checksum
         assert packet[:2] == b"\xa5\xb6"  # magic
         assert packet[2] == 0x1a  # type
         assert packet[6] == 0x02  # byte 6 is always 0x02
@@ -924,21 +924,21 @@ class TestSettingsClockSync:
         for i in range(1, len(days)):
             assert days[i] >= days[i - 1]
 
-    def test_feb9_airflow_byte_match_is_coincidental(self):
-        """An AIRFLOW_BYTES[HIGH] pair appears in a clock sync packet.
+    def test_feb9_settings_byte_pair_match_is_coincidental(self):
+        """A SETTINGS_BYTE_PAIRS[HIGH] pair appears in a clock sync packet.
 
         Packet a5b61a06061a02080e073033 has bytes 9-10 = (0x07, 0x30),
-        matching AIRFLOW_BYTES[HIGH]. The full context is clock sync:
+        matching SETTINGS_BYTE_PAIRS[HIGH]. The full context is clock sync:
         byte 7 = 0x08 (day 8), byte 8 = 0x0e (hour 14), bytes 9-10 =
-        minute 7, second 48. This shows AIRFLOW_BYTES values are valid
-        timestamp values.
+        minute 7, second 48. This shows SETTINGS_BYTE_PAIRS values are
+        valid timestamp values.
         """
-        from visionair_ble.protocol import AIRFLOW_BYTES
+        from visionair_ble.protocol import SETTINGS_BYTE_PAIRS
 
         # Packet #4: Feb 8, 14:07:48
         pkt4 = bytes.fromhex("a5b61a06061a02080e073033")
-        assert (pkt4[9], pkt4[10]) == AIRFLOW_BYTES[AirflowLevel.HIGH]
-        # But it's clock sync, not airflow — byte 7 is day 8, byte 8 is hour 14
+        assert (pkt4[9], pkt4[10]) == SETTINGS_BYTE_PAIRS[AirflowLevel.HIGH]
+        # Clock sync, not config — byte 7 is day 8, byte 8 is hour 14
         assert pkt4[7] == 8   # day
         assert pkt4[8] == 14  # hour
         assert pkt4[9] == 7   # minute

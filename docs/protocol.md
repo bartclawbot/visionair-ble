@@ -369,7 +369,7 @@ Each slot is 2 bytes:
 | Mode 3 | 0x3C | 60 | HIGH |
 
 > **Note:** The decimal values follow a regular 40/50/60 pattern, unlike the
-> `AIRFLOW_BYTES` pairs used by `build_settings_packet()` (two-byte pairs
+> `SETTINGS_BYTE_PAIRS` used by `build_settings_packet()` (two-byte pairs
 > with unverified semantics).
 
 **Example** (hour 0 set to HIGH at 18°C, hours 1-8 LOW, 9-17 MEDIUM, 18-23 LOW):
@@ -436,17 +436,17 @@ Structure: `a5b6 1a 06 06 1a 02 <day> <hour> <minute> <second> <checksum>`
 Hours increase monotonically within each day; minutes and seconds stay in
 the 0-59 range. Byte 7 tracks the day-of-month.
 
-**`AIRFLOW_BYTES` in the codebase:**
+**`SETTINGS_BYTE_PAIRS` in the codebase:**
 
-The library's `AIRFLOW_BYTES` constant contains three byte pairs used by
-`build_settings_packet()`:
+The library's `SETTINGS_BYTE_PAIRS` constant contains three byte pairs used
+by `build_settings_packet()`:
 - LOW: `(0x19, 0x0A)` — also valid as minute=25, second=10
 - MEDIUM: `(0x28, 0x15)` — also valid as minute=40, second=21
 - HIGH: `(0x07, 0x30)` — also valid as minute=7, second=48
 
-These byte pairs are plausible clock sync timestamps and have not been
-confirmed as airflow configuration. The phone controls airflow mode via
-REQUEST param 0x18, not via SETTINGS.
+These byte pairs observed in clock sync traffic are plausible timestamp
+values; config-mode semantics unverified. The phone controls airflow mode
+via REQUEST param 0x18, not via SETTINGS.
 
 **Byte 7 observed values:**
 
@@ -650,8 +650,8 @@ Value `0x0F` (all bits set) indicates all components healthy.
 **SETTINGS packet (0x1a):**
 - Bytes 7-10 carry clock sync (day, hour, minute, second). See §7.1.
 - The phone controls airflow via REQUEST param 0x18, not SETTINGS.
-- `AIRFLOW_BYTES` values are plausible clock sync timestamps, not confirmed
-  airflow configuration.
+- `SETTINGS_BYTE_PAIRS` values observed in clock sync traffic; config-mode
+  semantics unverified.
 - `build_settings_packet()` sends byte 7 = 0x00/0x02, which the phone does
   not use. Whether the device firmware interprets low byte-7 values as a
   config sub-command is unverified. The function is retained because
